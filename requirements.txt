@@ -3,4 +3,4 @@ uvicorn[standard]
 pandas
 openpyxl
 xlrd
-
+python-multipart
