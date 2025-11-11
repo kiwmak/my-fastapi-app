@@ -1,0 +1,40 @@
+from fastapi import FastAPI, File, UploadFile, HTTPException
+from typing import List
+import pandas as pd
+from io import BytesIO
+
+app = FastAPI(title="Multi-Excel Upload + Pandas Demo")
+
+@app.get("/")
+def read_root():
+    return {"message": "Upload Excel files at /upload_excels"}
+
+@app.post("/upload_excels")
+async def upload_excels(files: List[UploadFile] = File(...)):
+    results = []
+
+    for file in files:
+        # Kiểm tra file Excel
+        if not file.filename.endswith((".xls", ".xlsx")):
+            results.append({"filename": file.filename, "error": "Not an Excel file"})
+            continue
+
+        try:
+            contents = await file.read()
+            df = pd.read_excel(BytesIO(contents))
+        except Exception as e:
+            results.append({"filename": file.filename, "error": str(e)})
+            continue
+
+        # Tính tổng các cột số
+        numeric_summary = {col: df[col].sum() for col in df.select_dtypes(include="number").columns}
+
+        results.append({
+            "filename": file.filename,
+            "rows": len(df),
+            "columns": list(df.columns),
+            "numeric_summary": numeric_summary,
+            "preview": df.head(5).to_dict(orient="records")
+        })
+
+    return {"files_processed": len(results), "results": results}
