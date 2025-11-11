@@ -1,41 +1,36 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from typing import List
+from fastapi import FastAPI, File, UploadFile, HTTPException
+import pandas as pd
+from io import BytesIO
 
-app = FastAPI(title="Demo FastAPI App for Render")
-
-# Dữ liệu lưu tạm trong memory
-fake_db = []
-
-# Model dữ liệu
-class Item(BaseModel):
-    id: int
-    name: str
-    description: str = None
+app = FastAPI(title="Excel Upload + Pandas Demo")
 
 @app.get("/")
 def read_root():
-    return {"message": "Hello, Render! This is a demo FastAPI app."}
+    return {"message": "Upload an Excel file at /upload_excel"}
 
-@app.get("/items", response_model=List[Item])
-def get_items():
-    """Lấy danh sách tất cả item"""
-    return fake_db
+@app.post("/upload_excel")
+async def upload_excel(file: UploadFile = File(...)):
+    # Kiểm tra file có phải Excel không
+    if not file.filename.endswith((".xls", ".xlsx")):
+        raise HTTPException(status_code=400, detail="File must be Excel (.xls or .xlsx)")
 
-@app.get("/items/{item_id}", response_model=Item)
-def get_item(item_id: int):
-    """Lấy item theo id"""
-    for item in fake_db:
-        if item["id"] == item_id:
-            return item
-    raise HTTPException(status_code=404, detail="Item not found")
+    # Đọc file Excel vào pandas
+    try:
+        contents = await file.read()
+        df = pd.read_excel(BytesIO(contents))
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error reading Excel file: {e}")
 
-@app.post("/items", response_model=Item)
-def create_item(item: Item):
-    """Thêm item mới"""
-    # Kiểm tra trùng ID
-    for existing_item in fake_db:
-        if existing_item["id"] == item.id:
-            raise HTTPException(status_code=400, detail="Item with this ID already exists")
-    fake_db.append(item.dict())
-    return item
+    # Xử lý demo: tính tổng mỗi cột số
+    summary = {}
+    for col in df.select_dtypes(include="number").columns:
+        summary[col] = df[col].sum()
+
+    # Trả dữ liệu JSON
+    return {
+        "filename": file.filename,
+        "rows": len(df),
+        "columns": list(df.columns),
+        "numeric_summary": summary,
+        "preview": df.head(5).to_dict(orient="records")
+    }
