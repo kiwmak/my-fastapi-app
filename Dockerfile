@@ -1,25 +1,33 @@
-# Base image Python 3.13 slim
+# Chọn image Python 3.13 chính thức
 FROM python:3.13-slim
 
-WORKDIR /app
-
-# Cài các tool cần thiết để build pandas
+# Cập nhật hệ thống và cài build-essential, gcc, g++
 RUN apt-get update && apt-get install -y \
     build-essential \
-    ninja-build \
-    python3-dev \
-    cython3 \
+    gcc \
+    g++ \
+    libffi-dev \
+    libbz2-dev \
+    liblzma-dev \
+    libssl-dev \
+    libsqlite3-dev \
+    git \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy code
-COPY . .
+# Copy file requirements
+COPY requirements.txt .
 
-# Upgrade pip và cài requirements
-RUN pip install --upgrade pip wheel
-RUN pip install -r requirements.txt
+# Cập nhật pip, wheel và cài dependencies
+RUN pip install --upgrade pip wheel \
+    && pip install --no-cache-dir -r requirements.txt
 
-# Expose port
-EXPOSE 10000
+# Copy toàn bộ source code vào container
+COPY . /app
+WORKDIR /app
 
-# Chạy uvicorn
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "10000"]
+# Mở port nếu dùng web service
+EXPOSE 8000
+
+# Command chạy app
+CMD ["python", "main.py"]
