@@ -30,4 +30,4 @@ WORKDIR /app
 EXPOSE 8000
 
 # Command chạy app
-CMD ["python", "app.py"]
+CMD ["python", "main.py"]
