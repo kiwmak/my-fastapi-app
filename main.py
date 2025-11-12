@@ -79,56 +79,58 @@ class DataManager:
             logger.error(f"Lỗi lưu data: {e}")
             return False
 
-    def import_data(self, file_path):
-        try:
-            df_new = pd.read_excel(file_path).fillna("")
-            df_existing = self.load_data()
+def excel_col_to_index(col):
+    """Chuyển chữ Excel (A, B, C...) thành index (0, 1, 2...)"""
+    col = col.upper()
+    index = 0
+    for i, char in enumerate(reversed(col)):
+        index += (ord(char) - ord('A') + 1) * (26 ** i)
+    return index - 1  # Vì index bắt đầu từ 0
 
-            # Map các tên cột
-            column_mapping = {
-                "KHÁCH HÀNG": ["KHÁCH HÀNG", "CUSTOMER", "TEN_KHACH_HANG"],
-                "ĐƠN HÀNG": ["ĐƠN HÀNG", "ORDER", "MA_DON_HANG"],
-                "MÃ HÀNG": ["MÃ HÀNG", "PRODUCT_CODE", "MA_HANG"],
-                "KÍCH THƯỚC": ["KÍCH THƯỚC", "SIZE", "KICH_THUOC"],
-                "BẤC": ["BẤC", "WICK", "Bac"],
-                "MÀU": ["MÀU", "COLOR", "MAU"],
-                "HƯƠNG LIỆU": ["HƯƠNG LIỆU", "FRAGRANCE", "HUONG_LIEU"]
+def import_data(self, file_path):
+    try:
+        # Đọc file mà không dùng header, vì sẽ map theo mã cột
+        df_new = pd.read_excel(file_path, header=None).fillna("")
+
+        # Map cột
+        cotNguon = ["A", "B", "G", "M", "Y", "AB"]
+        cotDich  = ["A", "B", "C", "D", "F", "G"]
+
+        mapping = {excel_col_to_index(src): dst for src, dst in zip(cotNguon, cotDich)}
+
+        # Đổi tên cột theo mapping
+        df_new.rename(columns=mapping, inplace=True)
+
+        # Các cột bắt buộc trong df_new
+        required_cols = [excel_col_to_index(c) for c in ["A", "B", "C"]]  # VD: KHÁCH HÀNG, ĐƠN HÀNG, MÃ HÀNG
+        missing_cols = [c for c in required_cols if c not in df_new.columns]
+
+        if missing_cols:
+            return {"success": False, "message": f"Thiếu cột: {missing_cols}"}
+
+        df_new["NGÀY_TẠO"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        df_existing = self.load_data()
+        if not df_existing.empty:
+            df_combined = pd.concat([df_existing, df_new], ignore_index=True)
+        else:
+            df_combined = df_new
+
+        # Loại bỏ trùng theo ĐƠN HÀNG + MÃ HÀNG
+        df_combined = df_combined.drop_duplicates(subset=[excel_col_to_index("B"), excel_col_to_index("C")], keep='last')
+
+        if self.save_data(df_combined):
+            return {
+                "success": True,
+                "message": f"Import thành công: {len(df_new)} dòng",
+                "total_rows": len(df_combined)
             }
+        else:
+            return {"success": False, "message": "Lỗi khi lưu dữ liệu"}
 
-            for standard_name, possible_names in column_mapping.items():
-                for possible_name in possible_names:
-                    if possible_name in df_new.columns:
-                        df_new = df_new.rename(columns={possible_name: standard_name})
-                        break
-
-            required_cols = ["KHÁCH HÀNG", "ĐƠN HÀNG", "MÃ HÀNG"]
-            missing_cols = [col for col in required_cols if col not in df_new.columns]
-
-            if missing_cols:
-                return {"success": False, "message": f"Thiếu cột: {', '.join(missing_cols)}"}
-
-            df_new["NGÀY_TẠO"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-            if not df_existing.empty:
-                df_combined = pd.concat([df_existing, df_new], ignore_index=True)
-            else:
-                df_combined = df_new
-
-            df_combined = df_combined.drop_duplicates(subset=["ĐƠN HÀNG", "MÃ HÀNG"], keep='last')
-
-            if self.save_data(df_combined):
-                return {
-                    "success": True,
-                    "message": f"Import thành công: {len(df_new)} dòng",
-                    "total_rows": len(df_combined)
-                }
-            else:
-                return {"success": False, "message": "Lỗi khi lưu dữ liệu"}
-
-        except Exception as e:
-            logger.error(f"Lỗi import: {e}")
-            return {"success": False, "message": f"Lỗi: {str(e)}"}
-
+    except Exception as e:
+        logger.error(f"Lỗi import: {e}")
+        return {"success": False, "message": f"Lỗi: {str(e)}"}
 
 class ExportManager:
     def __init__(self):
