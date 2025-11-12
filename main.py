@@ -44,6 +44,15 @@ TEMPLATE_FILE = os.path.join(TEMPLATE_DIR, "MAU.xlsx")
 LOGO_FILE = os.path.join(TEMPLATE_DIR, "logo.png")
 
 
+def excel_col_to_index(col):
+    """Chuyển chữ Excel (A, B, C...) thành index (0, 1, 2...)"""
+    col = col.upper()
+    index = 0
+    for i, char in enumerate(reversed(col)):
+        index += (ord(char) - ord('A') + 1) * (26 ** i)
+    return index - 1  # Vì index bắt đầu từ 0
+
+
 class DataManager:
     def __init__(self):
         self.data_file = DATA_FILE
@@ -79,58 +88,88 @@ class DataManager:
             logger.error(f"Lỗi lưu data: {e}")
             return False
 
-def excel_col_to_index(col):
-    """Chuyển chữ Excel (A, B, C...) thành index (0, 1, 2...)"""
-    col = col.upper()
-    index = 0
-    for i, char in enumerate(reversed(col)):
-        index += (ord(char) - ord('A') + 1) * (26 ** i)
-    return index - 1  # Vì index bắt đầu từ 0
+    def import_data(self, file_path):
+        try:
+            # Đọc file bắt đầu từ dòng thứ 2 (bỏ qua dòng tiêu đề)
+            # header=None: không dùng dòng nào làm header, skiprows=1: bỏ qua dòng đầu tiên
+            df_new = pd.read_excel(file_path, header=None, skiprows=1).fillna("")
 
-def import_data(self, file_path):
-    try:
-        # Đọc file mà không dùng header, vì sẽ map theo mã cột
-        df_new = pd.read_excel(file_path, header=None).fillna("")
+            logger.info(f"Đọc được {len(df_new)} dòng dữ liệu từ file import (bắt đầu từ dòng thứ 2)")
 
-        # Map cột
-        cotNguon = ["A", "B", "G", "M", "Y", "AB"]
-        cotDich  = ["A", "B", "C", "D", "F", "G"]
+            # Map cột theo chỉ số
+            cotNguon_Index = [excel_col_to_index(c) for c in ["A", "B", "G", "M", "Y", "AB"]]
+            cotDich_Name = ["KHÁCH HÀNG", "ĐƠN HÀNG", "MÃ HÀNG", "KÍCH THƯỚC", "MÀU", "HƯƠNG LIỆU"]
 
-        mapping = {excel_col_to_index(src): dst for src, dst in zip(cotNguon, cotDich)}
+            # Tạo DataFrame kết quả với các cột mong muốn
+            df_result = pd.DataFrame()
 
-        # Đổi tên cột theo mapping
-        df_new.rename(columns=mapping, inplace=True)
+            # Map dữ liệu từ cột nguồn sang cột đích
+            for src_idx, dst_col in zip(cotNguon_Index, cotDich_Name):
+                if src_idx < len(df_new.columns):
+                    df_result[dst_col] = df_new.iloc[:, src_idx]
+                else:
+                    df_result[dst_col] = ""
+                    logger.warning(f"Không tìm thấy cột index {src_idx} trong file import")
 
-        # Các cột bắt buộc trong df_new
-        required_cols = [excel_col_to_index(c) for c in ["A", "B", "C"]]  # VD: KHÁCH HÀNG, ĐƠN HÀNG, MÃ HÀNG
-        missing_cols = [c for c in required_cols if c not in df_new.columns]
-
-        if missing_cols:
-            return {"success": False, "message": f"Thiếu cột: {missing_cols}"}
-
-        df_new["NGÀY_TẠO"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-        df_existing = self.load_data()
-        if not df_existing.empty:
-            df_combined = pd.concat([df_existing, df_new], ignore_index=True)
-        else:
-            df_combined = df_new
-
-        # Loại bỏ trùng theo ĐƠN HÀNG + MÃ HÀNG
-        df_combined = df_combined.drop_duplicates(subset=[excel_col_to_index("B"), excel_col_to_index("C")], keep='last')
-
-        if self.save_data(df_combined):
-            return {
-                "success": True,
-                "message": f"Import thành công: {len(df_new)} dòng",
-                "total_rows": len(df_combined)
+            # Thêm các cột còn thiếu với giá trị mặc định
+            additional_cols = {
+                "BẤC": "",  # Thêm cột BẤC với giá trị rỗng
             }
-        else:
-            return {"success": False, "message": "Lỗi khi lưu dữ liệu"}
+            
+            for col, default_value in additional_cols.items():
+                if col not in df_result.columns:
+                    df_result[col] = default_value
 
-    except Exception as e:
-        logger.error(f"Lỗi import: {e}")
-        return {"success": False, "message": f"Lỗi: {str(e)}"}
+            # Thêm cột NGÀY_TẠO
+            df_result["NGÀY_TẠO"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+            # Kiểm tra dữ liệu bắt buộc
+            required_cols = ["KHÁCH HÀNG", "ĐƠN HÀNG", "MÃ HÀNG"]
+            
+            # Tạo mask để tìm các dòng thiếu dữ liệu bắt buộc
+            missing_data_mask = pd.Series([False] * len(df_result))
+            for col in required_cols:
+                if col in df_result.columns:
+                    missing_data_mask = missing_data_mask | df_result[col].isnull() | (df_result[col] == "")
+                else:
+                    # Nếu cột bắt buộc không tồn tại, tất cả các dòng đều thiếu
+                    missing_data_mask = pd.Series([True] * len(df_result))
+
+            if missing_data_mask.any():
+                invalid_rows = len(df_result[missing_data_mask])
+                logger.warning(f"Phát hiện {invalid_rows} dòng thiếu dữ liệu bắt buộc")
+                # Lọc bỏ dòng thiếu dữ liệu bắt buộc
+                df_result = df_result[~missing_data_mask]
+
+            if df_result.empty:
+                return {"success": False, "message": "Không có dữ liệu hợp lệ để import sau khi lọc"}
+
+            # Load dữ liệu hiện có
+            df_existing = self.load_data()
+            if not df_existing.empty:
+                # Kết hợp dữ liệu mới với dữ liệu cũ
+                df_combined = pd.concat([df_existing, df_result], ignore_index=True)
+            else:
+                df_combined = df_result
+
+            # Loại bỏ trùng theo ĐƠN HÀNG + MÃ HÀNG, giữ bản ghi mới nhất
+            df_combined = df_combined.drop_duplicates(subset=["ĐƠN HÀNG", "MÃ HÀNG"], keep='last')
+
+            if self.save_data(df_combined):
+                return {
+                    "success": True,
+                    "message": f"Import thành công: {len(df_result)} dòng (đã bỏ qua {len(df_new) - len(df_result)} dòng không hợp lệ)",
+                    "imported_rows": len(df_result),
+                    "skipped_rows": len(df_new) - len(df_result),
+                    "total_rows": len(df_combined)
+                }
+            else:
+                return {"success": False, "message": "Lỗi khi lưu dữ liệu"}
+
+        except Exception as e:
+            logger.error(f"Lỗi import: {e}")
+            return {"success": False, "message": f"Lỗi: {str(e)}"}
+
 
 class ExportManager:
     def __init__(self):
@@ -307,6 +346,7 @@ class ExportManager:
         try:
             if os.path.exists(self.logo_file):
                 img = OpenpyxlImage(self.logo_file)
+                # Thay đổi vị trí chèn logo nếu cần
                 worksheet.add_image(img, 'A1')
                 logger.info("Đã chèn logo vào báo cáo")
         except Exception as e:
@@ -316,7 +356,7 @@ class ExportManager:
 data_manager = DataManager()
 export_manager = ExportManager()
 
-# HTML Template với danh sách báo cáo
+# HTML Template với danh sách báo cáo (giữ nguyên)
 HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html>
@@ -781,7 +821,7 @@ HTML_TEMPLATE = """
 """
 
 
-# API Routes
+# API Routes (giữ nguyên)
 @app.get("/")
 async def root():
     return HTMLResponse(HTML_TEMPLATE)
