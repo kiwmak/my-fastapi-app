@@ -63,7 +63,7 @@ def excel_col_to_index(col):
 class DatabaseManager:
     def __init__(self):
         # 1. Đọc chuỗi kết nối từ biến môi trường
-        db_url = os.environ.get("mysql://root:vnBZVyqPcxqHMFbmdehHNYDxIOdBWWBO@yamabiko.proxy.rlwy.net:28046/railway")
+        db_url = os.environ.get("mysql+pymysql://root:vnBZVyqPcxqHMFbmdehHNYDxIOdBWWBO@yamabiko.proxy.rlwy.net:28046/railway")
         if not db_url:
             logger.error("DATABASE_URL không được set!")
             raise ValueError("DATABASE_URL không được set!")
