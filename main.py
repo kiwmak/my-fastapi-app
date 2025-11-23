@@ -24,20 +24,16 @@ import pymysql
 import os, time
 import logging
 
+
+
 logger = logging.getLogger(__name__)
 
 def init_engine():
-    db_url = os.environ.get("DATABASE_URL")
-    if not db_url:
-        logger.error("DATABASE_URL không được set!")
-        raise ValueError("DATABASE_URL không được set!")
-
-    # Railway trả về dạng: mysql://USER:PASS@HOST:PORT/DB
-    if db_url.startswith("mysql://"):
-        db_url = db_url.replace("mysql://", "mysql+pymysql://", 1)
+    # ===== PUBLIC HOST CỦA RAILWAY =====
+    db_url = "mysql+pymysql://root:vnBZVyqPcxqHMFbmdehHNYDxIOdBWWBO@yamabiko.proxy.rlwy.net:28046/railway"
 
     max_retries = 20
-    delay = 3
+    delay = 3  # giây
 
     for attempt in range(1, max_retries + 1):
         try:
@@ -46,10 +42,11 @@ def init_engine():
                 pool_pre_ping=True,
                 pool_recycle=180,
                 pool_size=5,
-                max_overflow=10
+                max_overflow=10,
+                connect_args={"connect_timeout": 10}
             )
 
-            # Test kết nối
+            # ===== TEST KẾT NỐI =====
             with engine.connect() as conn:
                 conn.execute(text("SELECT 1"))
 
@@ -58,12 +55,15 @@ def init_engine():
 
         except OperationalError as e:
             logger.warning(
-                f"MySQL chưa sẵn sàng (thử {attempt}/{max_retries}). "
-                f"Lỗi: {e}"
+                f"MySQL chưa sẵn sàng (thử {attempt}/{max_retries}). Lỗi: {e}"
             )
             time.sleep(delay)
 
     raise RuntimeError("❌ Không thể kết nối MySQL sau nhiều lần thử!")
+
+# Gọi để tạo engine
+self.engine = init_engine()
+
 
 # Gọi để tạo engine
 self.engine = init_engine()
