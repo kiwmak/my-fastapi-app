@@ -160,7 +160,7 @@ class DatabaseManager:
         """
         Đọc file Excel và import vào MySQL.
         Sử dụng logic "INSERT ... ON DUPLICATE KEY UPDATE" để mimic `drop_duplicates(keep='last')`.
-        """from fastapi import FastAPI, UploadFile, File, Form, HTTPException, BackgroundTasks
+# from fastapi import FastAPI, UploadFile, File, Form, HTTPException, BackgroundTasks
 from fastapi.responses import FileResponse, JSONResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
