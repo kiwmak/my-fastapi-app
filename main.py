@@ -18,35 +18,40 @@ import time
 from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
 
+from sqlalchemy import create_engine, text
+from sqlalchemy.exc import OperationalError
+import pymysql
+import os, time
+import logging
+
+logger = logging.getLogger(__name__)
+
 def init_engine():
     db_url = os.environ.get("DATABASE_URL")
     if not db_url:
         logger.error("DATABASE_URL không được set!")
         raise ValueError("DATABASE_URL không được set!")
 
-    # Railway trả về dạng: mysql://USER:PASSWORD@HOST:PORT/DB
-    # SQLAlchemy cần: mysql+pymysql://...
+    # Railway trả về dạng: mysql://USER:PASS@HOST:PORT/DB
     if db_url.startswith("mysql://"):
         db_url = db_url.replace("mysql://", "mysql+pymysql://", 1)
 
-    # ===== FIX QUAN TRỌNG CHO RAILWAY =====
-    # MySQL container KHỞI ĐỘNG CHẬM -> cần retry để tránh app crash (exit code 0)
     max_retries = 20
-    delay = 3  # giây
+    delay = 3
 
     for attempt in range(1, max_retries + 1):
         try:
             engine = create_engine(
                 db_url,
-                pool_pre_ping=True,     # tránh connection stale
-                pool_recycle=180,       # cần thiết trên Railway
+                pool_pre_ping=True,
+                pool_recycle=180,
                 pool_size=5,
                 max_overflow=10
             )
 
             # Test kết nối
             with engine.connect() as conn:
-                conn.execute("SELECT 1")
+                conn.execute(text("SELECT 1"))
 
             logger.info("🎉 MySQL READY! Đã kết nối thành công.")
             return engine
