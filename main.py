@@ -18,6 +18,15 @@ import glob
 from sqlalchemy import create_engine, text
 import pymysql
 
+
+
+# Serve logo / file tĩnh
+app.mount("/templates", StaticFiles(directory="templates"), name="templates")
+
+@app.get("/nhietdo")
+def nhiet_do():
+    return FileResponse("nhiet_do_do_sap_web.html")
+
 # --- Cấu hình logging, app, CORS (Giữ nguyên) ---
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
