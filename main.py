@@ -20,12 +20,18 @@ import pymysql
 
 
 
-# Serve logo / file tĩnh
+# Đảm bảo đường dẫn này được chạy đầu tiên
 app.mount("/templates", StaticFiles(directory="templates"), name="templates")
 
 @app.get("/nhietdo")
 def nhiet_do():
-    return FileResponse("nhiet_do_do_sap_web.html")
+    # Sử dụng TEMPLATE_DIR đã được khai báo ở trên
+    file_path = os.path.join(TEMPLATE_DIR, "nhiet_do_do_sap_web.html")
+    if not os.path.exists(file_path):
+        # Nâng cấp response nếu file không tồn tại
+        return HTMLResponse(content=f"<h1>Lỗi 404</h1><p>Không tìm thấy file: nhiet_do_do_sap_web.html trong thư mục {TEMPLATE_DIR}</p>", status_code=404)
+        
+    return FileResponse(file_path)
 
 # --- Cấu hình logging, app, CORS (Giữ nguyên) ---
 logging.basicConfig(level=logging.INFO)
@@ -631,7 +637,12 @@ HTML_TEMPLATE = """
                     <i class="fas fa-cog me-2"></i>Quản lý Template
                 </button>
             </li>
-        </ul>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" href="/nhietdo" target="_blank">
+                    <i class="fas fa-fire-alt me-2"></i>Test Nhiệt Độ
+                </a>
+            </li>
+            </ul>
 
         <div class="tab-content" id="mainTabsContent">
             <div class="tab-pane fade show active" id="dashboard" role="tabpanel">
