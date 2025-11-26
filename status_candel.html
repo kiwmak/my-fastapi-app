@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đánh Giá Tình Trạng Nến</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f9f7f0 0%, #e8e1d1 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: #8B4513;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .status-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .status-table th {
+            background: #8B4513;
+            color: white;
+            padding: 20px 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: 1px solid #ddd;
+        }
+        
+        .status-table td {
+            padding: 20px 15px;
+            border: 1px solid #ddd;
+            vertical-align: top;
+        }
+        
+        .status-category {
+            font-weight: bold;
+            color: #8B4513;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .status-description {
+            margin-top: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .classification {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .classification strong {
+            color: #8B4513;
+        }
+        
+        .examples {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        
+        .example-item {
+            text-align: center;
+            flex: 1;
+            padding: 5px;
+        }
+        
+        .image-section {
+            text-align: center;
+            margin: 40px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .chart-image {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+            border: 1px solid #ddd;
+        }
+        
+        .explanation {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            margin-top: 40px;
+        }
+        
+        .explanation h2 {
+            color: #8B4513;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+        
+        .explanation p {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            background: #8B4513;
+            color: white;
+            border-radius: 0 0 15px 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .status-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .examples {
+                flex-direction: column;
+            }
+            
+            .example-item {
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Đánh Giá Tình Trạng Nến</h1>
+            <p class="subtitle">Hướng dẫn đánh giá tình trạng bấc, ngọn lửa và bát đốt của nến</p>
+        </header>
+        
+        <div class="content">
+            <table class="status-table">
+                <tr>
+                    <th>Wick Posture<br>(Tư thế bấc)</th>
+                    <th>Flame Appearance<br>(Biểu hiện ngọn lửa)</th>
+                    <th>Burning Bowl / Rim<br>(Bát đốt / Vành)</th>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="status-category">A) Tư thế bấc lý tưởng</div>
+                        <div class="status-description">Bấc nhô ra khỏi nến ở tư thế thẳng đứng và uốn cong ở đầu về phía ngoài ngọn lửa.</div>
+                    </td>
+                    <td>
+                        <div class="status-category">A) Ngọn lửa lý tưởng</div>
+                        <div class="status-description">Ngọn lửa sáng, ổn định, không có muội than nhìn thấy được.</div>
+                    </td>
+                    <td>
+                        <div class="status-category">A) Bát đốt lý tưởng</div>
+                        <div class="status-description">Bát đốt bình thường, không có mảnh vụn.</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="status-category">B) Bấc xoắn</div>
+                        <div class="status-description">Bấc bị xoắn như cái mở nút chai.</div>
+                    </td>
+                    <td>
+                        <div class="status-category">B) Ngọn lửa dao động</div>
+                        <div class="status-description">Ngọn lửa không ổn định và có thể tạo muội ngay cả khi chiều cao ngọn lửa ổn định.</div>
+                    </td>
+                    <td>
+                        <div class="status-category">B) Mảnh vụn</div>
+                        <div class="status-description">Tàn bấc, sắc tố, đồ trang trí, v.v. trong vũng sáp.</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="status-category">C) Bấc hình nấm</div>
+                        <div class="status-description">Cục u trên bấc. Bấc đứng thẳng và không uốn cong về phía ngoài của ngọn lửa.</div>
+                        <div class="examples">
+                            <div class="example-item"><strong>C1</strong><br>Tối thiểu</div>
+                            <div class="example-item"><strong>C2</strong><br>Đáng chú ý</div>
+                            <div class="example-item"><strong>C3</strong><br>Quá mức</div>
+                        </div>
+                        <div class="classification">
+                            <strong>Phân loại:</strong> Bấc bị uốn cong quá mạnh.
+                        </div>
+                    </td>
+                    <td>
+                        <div class="status-category">C) Muội than nhìn thấy rõ</div>
+                        <div class="status-description">Ngọn lửa cao và thậm chí có thể bị tách ở đỉnh.</div>
+                    </td>
+                    <td>
+                        <div class="status-category">C) Cháy thứ cấp</div>
+                        <div class="status-description">Cháy vật liệu khác ngoài bấc dự định (ví dụ: mảnh vụn bấc cháy, cháy lan, v.v.).</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <div class="status-category">D) Ngọn lửa nhỏ</div>
+                        <div class="status-description">Ngọn lửa co lại và bát đốt đầy sáp lỏng.</div>
+                    </td>
+                    <td>
+                        <div class="status-category">D) Nhỏ giọt / Tràn</div>
+                        <div class="status-description">Bát đốt hoàn toàn đầy sáp lỏng.</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <div class="status-category">E) Tiếng nổ lách tách</div>
+                        <div class="status-description">Nến tạo ra âm thanh lách tách khi cháy.</div>
+                    </td>
+                    <td>
+                        <div class="status-category">E) Bấc đổ</div>
+                        <div class="status-description">Bấc bị đổ / nghiêng.</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="status-category">F) Tàn tro</div>
+                        <div class="status-description">Vật liệu không cháy tập trung ở cuối bấc.</div>
+                        <div class="examples">
+                            <div class="example-item"><strong>F1</strong></div>
+                            <div class="example-item"><strong>F2</strong></div>
+                            <div class="example-item"><strong>F3</strong></div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="status-category">F) Tàn tro</div>
+                        <div class="status-description">Vật liệu không cháy tập trung ở cuối bấc.</div>
+                        <div class="examples">
+                            <div class="example-item"><strong>F1</strong></div>
+                            <div class="example-item"><strong>F2</strong></div>
+                            <div class="example-item"><strong>F3</strong></div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="status-category">F) Tàn tro</div>
+                        <div class="status-description">Vật liệu không cháy tập trung ở cuối bấc.</div>
+                        <div class="examples">
+                            <div class="example-item"><strong>F1</strong></div>
+                            <div class="example-item"><strong>F2</strong></div>
+                            <div class="example-item"><strong>F3</strong></div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="status-category">G) Không ở trung tâm</div>
+                        <div class="status-description">Bấc không được đặt ở trung tâm của nến.</div>
+                    </td>
+                    <td>
+                        <div class="status-category">G) Không ở trung tâm</div>
+                        <div class="status-description">Bấc không được đặt ở trung tâm của nến.</div>
+                    </td>
+                    <td>
+                        <div class="status-category">G) Không ở trung tâm</div>
+                        <div class="status-description">Bấc không được đặt ở trung tâm của nến.</div>
+                    </td>
+                </tr>
+            </table>
+            
+            <div class="image-section">
+                <h2>Hình ảnh minh họa biểu đồ</h2>
+                <img src="status.png" alt="Biểu đồ đánh giá tình trạng nến" class="chart-image">
+                <p><em>Biểu đồ đánh giá tình trạng bấc, ngọn lửa và bát đốt của nến</em></p>
+            </div>
+            
+            <div class="explanation">
+                <h2>Hướng dẫn sử dụng biểu đồ</h2>
+                <p>Biểu đồ này cung cấp hướng dẫn toàn diện để đánh giá tình trạng nến trong quá trình sử dụng.</p>
+                <p><strong>Cột 1 - Tư thế bấc:</strong> Đánh giá hình dạng và vị trí của bấc nến.</p>
+                <p><strong>Cột 2 - Biểu hiện ngọn lửa:</strong> Quan sát đặc điểm của ngọn lửa khi nến cháy.</p>
+                <p><strong>Cột 3 - Bát đốt / Vành:</strong> Kiểm tra tình trạng của bát đốt và vành nến.</p>
+                <p>Sử dụng biểu đồ này để xác định vấn đề và thực hiện điều chỉnh cần thiết để đảm bảo nến hoạt động tối ưu và an toàn.</p>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Biểu đồ Đánh Giá Tình Trạng Nến &copy; 2023 - Hướng dẫn sử dụng nến an toàn và hiệu quả</p>
+        </footer>
+    </div>
+</body>
+</html>
