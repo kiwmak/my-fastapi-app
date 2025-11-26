@@ -41,7 +41,7 @@ def nhiet_do():
     return FileResponse("nhiet_do_do_sap_web.html")
 @app.get("/muoi")
 def muoi():
-    return FileResponse("soot.htm") 
+    return FileResponse("muoi.html") 
 @app.get("/status")
 def status():
     return FileResponse("status_candel.html")  
