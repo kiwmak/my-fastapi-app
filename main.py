@@ -42,7 +42,7 @@ def nhiet_do():
 @app.get("/muoi")
 def muoi():
     return FileResponse("soot.htm") 
-  @app.get("/status")
+@app.get("/status")
 def status():
     return FileResponse("status_candel.html")  
 # --- Thư mục và File paths (Giữ nguyên) ---
