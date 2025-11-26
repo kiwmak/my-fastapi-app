@@ -39,6 +39,12 @@ app.mount("/templates", StaticFiles(directory="templates"), name="templates")
 @app.get("/nhietdo")
 def nhiet_do():
     return FileResponse("nhiet_do_do_sap_web.html")
+@app.get("/muoi")
+def muoi():
+    return FileResponse("soot.htm") 
+  @app.get("/status")
+def status():
+    return FileResponse("status_candel.html")  
 # --- Thư mục và File paths (Giữ nguyên) ---
 UPLOAD_DIR = "uploads"
 EXPORT_DIR = "exports"
@@ -630,8 +636,13 @@ HTML_TEMPLATE = """
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <a class="nav-link" href="/nhietdo" target="_blank">
-                    <i class="fas fa-fire-alt me-2"></i>Test Nhiệt Độ
+                <a class="nav-link" href="/soot" target="_blank">
+                    <i class="fas fa-fire-alt me-2"></i>Mức độ muội than
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" href="/status" target="_blank">
+                    <i class="fas fa-fire-alt me-2"></i>Hướng dấn đánh giá kết quả test đốt 
                 </a>
             </li>
             </ul>
