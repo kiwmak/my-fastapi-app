@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biểu đồ Đánh giá Muội</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .acceptance-info {
+            background: #e8f4f8;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+            border-left: 5px solid #3498db;
+        }
+        
+        .acceptance-info h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .acceptance-levels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        
+        .acceptable, .unacceptable {
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            flex: 1;
+            margin: 0 10px;
+        }
+        
+        .acceptable {
+            background: #d4f5e2;
+            color: #27ae60;
+            border: 2px solid #2ecc71;
+        }
+        
+        .unacceptable {
+            background: #f8d7da;
+            color: #c0392b;
+            border: 2px solid #e74c3c;
+        }
+        
+        .chart-section {
+            margin: 40px 0;
+        }
+        
+        .chart-title {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: #2c3e50;
+            font-weight: 700;
+        }
+        
+        .evaluation-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .evaluation-table th {
+            padding: 25px 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            height: 120px;
+            vertical-align: bottom;
+            border: none;
+        }
+        
+        .class-5 { 
+            background: linear-gradient(to bottom, #d4edda, #a8e6a3);
+            color: #155724;
+        }
+        
+        .class-4 { 
+            background: linear-gradient(to bottom, #e8f5e8, #c8e6c9);
+            color: #1e7e34;
+        }
+        
+        .class-3 { 
+            background: linear-gradient(to bottom, #fff3cd, #ffe082);
+            color: #856404;
+        }
+        
+        .class-2 { 
+            background: linear-gradient(to bottom, #f8d7da, #f5b7b1);
+            color: #721c24;
+        }
+        
+        .class-1 { 
+            background: linear-gradient(to bottom, #f1aeb5, #e57373);
+            color: #721c24;
+        }
+        
+        .image-section {
+            text-align: center;
+            margin: 40px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .chart-image {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+            border: 1px solid #ddd;
+        }
+        
+        .image-link {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        
+        .image-link:hover {
+            background: #2980b9;
+        }
+        
+        .explanation {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            margin-top: 40px;
+        }
+        
+        .explanation h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+        
+        .explanation p {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            background: #2c3e50;
+            color: white;
+            border-radius: 0 0 15px 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .evaluation-table th {
+                padding: 15px 8px;
+                font-size: 0.9rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .acceptance-levels {
+                flex-direction: column;
+            }
+            
+            .acceptable, .unacceptable {
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Biểu đồ Đánh giá Muội</h1>
+            <p class="subtitle">Hệ thống phân loại và đánh giá mức độ muội trong quá trình vận hành</p>
+        </header>
+        
+        <div class="content">
+            <div class="acceptance-info">
+                <h2>Mức độ chấp nhận muội</h2>
+                <div class="acceptance-levels">
+                    <div class="acceptable">
+                        <strong>CHẤP NHẬN ĐƯỢC: Class 5-4-3</strong>
+                    </div>
+                    <div class="unacceptable">
+                        <strong>KHÔNG CHẤP NHẬN: Class 2-1</strong>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-section">
+                <h2 class="chart-title">Sooting Evaluation Chart</h2>
+                
+                <table class="evaluation-table">
+                    <tr>
+                        <th class="class-5">Class 5<br>No Change</th>
+                        <th class="class-4">Class 4<br>Slight Change</th>
+                        <th class="class-3">Class 3<br>Moderate Sooting</th>
+                        <th class="class-2">Class 2<br>Excessive Sooting</th>
+                        <th class="class-1">Class 1<br>Maximum Sooting</th>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="image-section">
+                <h2>Hình ảnh minh họa biểu đồ</h2>
+                <img src="image_650919.png" alt="Biểu đồ đánh giá muội" class="chart-image">
+                <div>
+                    <a href="image_650919.png" class="image-link" target="_blank">Xem ảnh gốc</a>
+                </div>
+                <p><em>Liên kết đến hình ảnh biểu đồ đánh giá muội</em></p>
+            </div>
+            
+            <div class="explanation">
+                <h2>Giải thích các mức độ đánh giá</h2>
+                <p><strong>Class 5 - No Change:</strong> Không có sự thay đổi đáng kể, mức độ muội ở mức tối thiểu, hoạt động bình thường.</p>
+                <p><strong>Class 4 - Slight Change:</strong> Thay đổi nhẹ, mức độ muội tăng nhưng vẫn trong phạm vi cho phép.</p>
+                <p><strong>Class 3 - Moderate Sooting:</strong> Mức độ muội trung bình, cần theo dõi và có biện pháp bảo trì sớm.</p>
+                <p><strong>Class 2 - Excessive Sooting:</strong> Mức độ muội quá mức, cần can thiệp bảo trì ngay lập tức.</p>
+                <p><strong>Class 1 - Maximum Sooting:</strong> Mức độ muội tối đa, nguy cơ cao gây hư hỏng thiết bị, cần dừng máy để xử lý.</p>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Biểu đồ Đánh giá Muội &copy; 2023 - Hệ thống giám sát và bảo trì</p>
+        </footer>
+    </div>
+</body>
+</html>
