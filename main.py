@@ -636,7 +636,7 @@ HTML_TEMPLATE = """
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <a class="nav-link" href="/nhiet_do" target="_blank">
+                <a class="nav-link" href="/nhietdo" target="_blank">
                     <i class="fas fa-fire-alt me-2"></i>Nhiệt độ rót nến
                 </a>
             </li>
