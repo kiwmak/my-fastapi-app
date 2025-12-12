@@ -22,3 +22,6 @@ python-dateutil>=2.8.2
 #image
 Pillow
 pymysql
+
+psycopg2-binary==2.9.9
+python-multipart==0.0.6
