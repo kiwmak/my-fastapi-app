@@ -15,12 +15,23 @@ import logging
 import re
 import glob
 
-# --- Cấu hình logging, app, CORS (Giữ nguyên) ---
+# --- Cấu hình logging ---
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# --- Tạo các thư mục trước khi khởi tạo app ---
+UPLOAD_DIR = "uploads"
+EXPORT_DIR = "exports"
+DATA_DIR = "data"
+TEMPLATE_DIR = "templates"
+
+for directory in [UPLOAD_DIR, EXPORT_DIR, DATA_DIR, TEMPLATE_DIR]:
+    os.makedirs(directory, exist_ok=True)
+
+# --- Khởi tạo app ---
 app = FastAPI(title="Quản lý Test Đốt", version="1.0.0")
 
+# --- CORS ---
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -28,8 +39,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.mount("/templates", StaticFiles(directory="templates"), name="templates")
-app.mount("/exports", StaticFiles(directory="exports"), name="exports")
+
+# --- Mount static files (sau khi đã tạo thư mục) ---
+app.mount("/templates", StaticFiles(directory=TEMPLATE_DIR), name="templates")
+app.mount("/exports", StaticFiles(directory=EXPORT_DIR), name="exports")
 
 @app.get("/nhietdo")
 def nhiet_do():
@@ -43,15 +56,7 @@ def muoi():
 def status():
     return FileResponse("status_candel.html")  
 
-# --- Thư mục và File paths (Giữ nguyên) ---
-UPLOAD_DIR = "uploads"
-EXPORT_DIR = "exports"
-DATA_DIR = "data"
-TEMPLATE_DIR = "templates"
-
-for directory in [UPLOAD_DIR, EXPORT_DIR, DATA_DIR, TEMPLATE_DIR]:
-    os.makedirs(directory, exist_ok=True)
-
+# --- File paths (sau khi đã tạo thư mục) ---
 TEMPLATE_FILE = os.path.join(TEMPLATE_DIR, "MAU.xlsx")
 LOGO_FILE = os.path.join(TEMPLATE_DIR, "logo.png")
 
@@ -474,9 +479,7 @@ def save_upload_file(upload_file: UploadFile, destination_path: str, filename: s
         logger.error(f"Lỗi lưu file {filename}: {e}")
         return False
 
-
-# --- API Endpoints ---
-
+# --- HTML Template (giữ nguyên) ---
 HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html>
