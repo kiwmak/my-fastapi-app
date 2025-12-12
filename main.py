@@ -78,14 +78,36 @@ class DatabaseManager:
             logger.error("DATABASE_URL không được set!")
             raise ValueError("DATABASE_URL không được set!")
 
-        # 2. SQLAlchemy cần driver 'mysql+pymysql' thay vì 'mysql'
-        if db_url.startswith("mysql://"):
-            db_url = db_url.replace("mysql://", "mysql+pymysql://", 1)
+        # 2. Điều chỉnh chuỗi kết nối cho PostgreSQL và driver
+        connect_args = {}
         
-        self.engine = create_engine(db_url)
-        logger.info("Đã kết nối tới MySQL Database.")
+        # Nếu là PostgreSQL (trên Render/Cloud)
+        if db_url.startswith("postgres://"):
+            # Chuyển đổi 'postgres://' (cũ) thành 'postgresql+psycopg2://' (SQLAlchemy)
+            db_url = db_url.replace("postgres://", "postgresql+psycopg2://", 1)
+            
+            # Thêm tham số SSL là BẮT BUỘC cho Render
+            connect_args['sslmode'] = 'require'
+
+        # Nếu là chuỗi đã có 'postgresql://' (hiện đại hơn)
+        elif db_url.startswith("postgresql://"):
+            # Chuyển đổi 'postgresql://' thành 'postgresql+psycopg2://'
+            db_url = db_url.replace("postgresql://", "postgresql+psycopg2://", 1)
+            
+            # Thêm tham số SSL
+            connect_args['sslmode'] = 'require'
+
+        # *** LOẠI BỎ logic MySQL cũ ***
         
-        # 3. Đảm bảo bảng dữ liệu tồn tại
+        # 3. Tạo Engine
+        self.engine = create_engine(
+            db_url,
+            connect_args=connect_args,
+            pool_pre_ping=True
+        )
+        logger.info("Đã kết nối tới PostgreSQL Database.")
+        
+        # 4. Đảm bảo bảng dữ liệu tồn tại
         self.ensure_table_exists()
 
     def ensure_table_exists(self):
