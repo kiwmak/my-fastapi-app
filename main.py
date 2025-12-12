@@ -79,7 +79,7 @@ class DatabaseManager:
         db_url = os.environ.get("DATABASE_URL")
         if not db_url:
             # Fallback cho local development
-            db_url = "postgresql://postgres:password@localhost:5432/test_dot_db"
+            db_url = "postgresql://upload_h3ob_user:Z1Or09fNKoFQ7LmeABnkiMK0aqYXqiqs@dpg-d4t79mmr433s738853o0-a.singapore-postgres.render.com:5432/upload_qkg4"
             logger.warning(f"Using fallback database URL: {db_url}")
             # raise ValueError("DATABASE_URL không được set!")
 
