@@ -7,7 +7,8 @@ services:
     envVars:
       - key: DATABASE_URL
         fromDatabase:
-          name: test_dot_db
+          name: upload_qkg4
           property: connectionString
     healthCheckPath: /
     autoDeploy: true
+
