@@ -15,7 +15,7 @@ import re
 import glob
 
 # Import thư viện mới cho MySQL
-from sqlalchemy import create_engine, text
+#from sqlalchemy import create_engine, text
 #import pymysql
 #import MySQLdb as mysql
 
