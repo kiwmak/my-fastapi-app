@@ -1,4 +1,4 @@
-FROM python:3.11-slim  # Sử dụng Python 3.11 hoặc 3.10
+FROM python:3.11 
 
 # Cài đặt system dependencies
 RUN apt-get update && apt-get install -y \
