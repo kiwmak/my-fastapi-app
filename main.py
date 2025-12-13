@@ -74,39 +74,43 @@ def excel_col_to_index(col):
 # =======================================================================
 
 class DatabaseManager:
-    def __init__(self):
-        # 1. Đọc chuỗi kết nối từ biến môi trường
-        db_url = os.environ.get("DATABASE_URL")
-        if not db_url:
-            # Fallback cho local development
-            db_url = "postgresql://upload_h3ob_user:Z1Or09fNKoFQ7LmeABnkiMK0aqYXqiqs@dpg-d4t79mmr433s738853o0-a.singapore-postgres.render.com:5432/upload_qkg4"
-            logger.warning(f"Using fallback database URL: {db_url}")
-            # raise ValueError("DATABASE_URL không được set!")
-
-        # 2. Điều chỉnh chuỗi kết nối cho PostgreSQL
-        connect_args = {}
-        
-        # Nếu là PostgreSQL (Render/Heroku/Cloud)
-        if db_url.startswith("postgres://"):
-            # Chuyển đổi 'postgres://' thành 'postgresql://'
-            db_url = db_url.replace("postgres://", "postgresql://", 1)
-        
-        # Thêm tham số SSL cho môi trường production
-        if 'render.com' in db_url or 'herokuapp.com' in db_url:
-            connect_args['sslmode'] = 'require'
-
-        # 3. Tạo Engine
+   def __init__(self):
+    # Lấy DATABASE_URL từ biến môi trường
+    db_url = os.environ.get("DATABASE_URL")
+    
+    if not db_url:
+        # Fallback cho local development
+        db_url = "postgresql://upload_h3ob_user:Z1Or09fNKoFQ7LmeABnkiMK0aqYXqiqs@dpg-d4t79mmr433s738853o0-a.singapore-postgres.render.com:5432/upload_qkg4"
+        logger.warning("Sử dụng fallback database URL")
+    
+    # Đảm bảo chuỗi kết nối sử dụng đúng dialect PostgreSQL với psycopg2
+    if db_url.startswith("postgres://"):
+        db_url = db_url.replace("postgres://", "postgresql+psycopg2://", 1)
+    elif db_url.startswith("postgresql://"):
+        db_url = db_url.replace("postgresql://", "postgresql+psycopg2://", 1)
+    
+    # Nếu đã có postgresql+psycopg2:// thì giữ nguyên
+    
+    # Thêm SSL cho production
+    connect_args = {}
+    if 'render.com' in db_url or 'herokuapp.com' in db_url:
+        connect_args['sslmode'] = 'require'
+    
+    try:
         self.engine = create_engine(
             db_url,
             connect_args=connect_args,
             pool_pre_ping=True,
-            echo=False  # Đặt True để debug SQL
+            echo=False  # Đặt True để debug SQL queries
         )
-        logger.info(f"Đã kết nối tới PostgreSQL Database: {db_url}")
-        
-        # 4. Đảm bảo bảng dữ liệu tồn tại
+        logger.info(f"Đã kết nối tới PostgreSQL database")
         self.ensure_table_exists()
-
+    except Exception as e:
+        logger.error(f"Lỗi kết nối database: {e}")
+        # Tạo engine rỗng để tránh crash
+        self.engine = None
+        
+    
     def ensure_table_exists(self):
         """
         Tạo bảng 'data' nếu nó chưa tồn tại.
