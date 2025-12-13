@@ -74,35 +74,39 @@ def excel_col_to_index(col):
 # =======================================================================
 
 class DatabaseManager:
-   def __init__(self):
-    # Lấy DATABASE_URL từ biến môi trường
-    db_url = os.environ.get("DATABASE_URL")
-    
-    if not db_url:
-        # Fallback cho local development
-        db_url = "postgresql://upload_h3ob_user:Z1Or09fNKoFQ7LmeABnkiMK0aqYXqiqs@dpg-d4t79mmr433s738853o0-a.singapore-postgres.render.com:5432/upload_qkg4"
-        logger.warning("Sử dụng fallback database URL")
-    
-    # Đảm bảo chuỗi kết nối sử dụng đúng dialect PostgreSQL với psycopg2
-    if db_url.startswith("postgres://"):
-        db_url = db_url.replace("postgres://", "postgresql+psycopg2://", 1)
-    elif db_url.startswith("postgresql://"):
-        db_url = db_url.replace("postgresql://", "postgresql+psycopg2://", 1)
-    
-    # Nếu đã có postgresql+psycopg2:// thì giữ nguyên
-    
-    # Thêm SSL cho production
-    connect_args = {}
-    if 'render.com' in db_url or 'herokuapp.com' in db_url:
-        connect_args['sslmode'] = 'require'
-    
-    try:
-        self.engine = create_engine(
-            db_url,
-            connect_args=connect_args,
-            pool_pre_ping=True,
-            echo=False  # Đặt True để debug SQL queries
-        )
+  def __init__(self):
+        db_url = os.environ.get("DATABASE_URL")
+        
+        if not db_url:
+            db_url = "postgresql://upload_h3ob_user:..."
+            logger.warning("Sử dụng fallback database URL")
+        
+        # --- SỬA ĐỔI QUAN TRỌNG TẠI ĐÂY ---
+        # 1. Đảm bảo sử dụng 'postgresql' dialect (tên chuẩn của SQLAlchemy)
+        # 2. Xóa bỏ logic thay thế 'postgresql://' bằng 'postgresql+psycopg2://' thủ công
+        # 3. SQLAlchemy sẽ tự động chọn psycopg2 vì nó là driver mặc định
+        
+        # Đảm bảo URL bắt đầu bằng 'postgresql://' (tên dialect chuẩn)
+        if db_url.startswith("postgres://"):
+            db_url = db_url.replace("postgres://", "postgresql://", 1)
+            
+        # --- KHÔNG CẦN DÒNG THAY THẾ +psycopg2 NỮA ---
+        
+        # Thêm SSL cho production (Bắt buộc cho Render)
+        connect_args = {}
+        if 'render.com' in db_url or 'herokuapp.com' in db_url:
+            # Đối với Render, chúng ta thường cần sslmode=require
+            connect_args['sslmode'] = 'require'
+            # Cần đảm bảo rằng tên dialect là 'postgresql' (không phải 'postgres')
+            # SQLAlchemy 2.0+ sẽ tự tìm driver phù hợp.
+        
+        try:
+            self.engine = create_engine(
+                db_url,
+                connect_args=connect_args,
+                pool_pre_ping=True,
+                echo=False
+            )
         logger.info(f"Đã kết nối tới PostgreSQL database")
         self.ensure_table_exists()
     except Exception as e:
