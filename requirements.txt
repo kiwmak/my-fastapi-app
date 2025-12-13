@@ -8,7 +8,7 @@ uvicorn[standard]>=0.23.0
 
 # Database
 SQLAlchemy
-pymysql
+
 
 # Excel / File handling
 openpyxl>=3.1.2
@@ -23,5 +23,5 @@ python-dateutil>=2.8.2
 Pillow
 pymysql
 # Database
-psycopg2==2.9.9  # <-- PostgreSQL driver
+psycopg2-binary==2.9.9  # <-- PostgreSQL driver
 python-multipart==0.0.6
