@@ -30,4 +30,5 @@ COPY . /app
 # ---------------------------------------------------------------------
 # FIX 6 (Runtime): Define the startup command using the Render PORT env var
 # ---------------------------------------------------------------------
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "${PORT}"]
+# AFTER (Shell Form - Works with variables)
+CMD uvicorn main:app --host 0.0.0.0 --port $PORT
