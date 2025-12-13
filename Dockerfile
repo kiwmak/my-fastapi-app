@@ -1,5 +1,5 @@
 # Chọn image Python 3.13 chính thức
-FROM python:3.13-slim
+FROM python:3.11-slim-bullseye  # Hoặc 3.10
 
 # Cập nhật hệ thống và cài build-essential, gcc, g++
 RUN apt-get update && apt-get install -y \
