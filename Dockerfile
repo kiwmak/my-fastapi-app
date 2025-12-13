@@ -34,4 +34,4 @@ RUN pip install --upgrade pip wheel \
 # COPY . . 
 
 # Define the command to run your application
-# CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
+# CMD ["uvicorn", "main:app"]
